@@ -10,7 +10,7 @@ import (
 
 var lock sync.RWMutex
 
-func GetEnv(name string, def string) string  {
+func GetEnv(name string, def string) string {
 	lock.RLock()
 	defer lock.RUnlock()
 	if value, ok := envMap[name]; ok {
@@ -31,7 +31,7 @@ func parseLinesAndWriteEnvMap(lines []string) (err error) {
 
 		_, key, value, err = parseLine(line)
 		if err != nil {
-			return errors.New(fmt.Sprintf("line %d - %s", i + 1, err.Error()))
+			return errors.New(fmt.Sprintf("line %d - %s", i+1, err.Error()))
 		}
 		if len(key) == 0 {
 			continue
@@ -46,7 +46,8 @@ func parseLine(line string) (export bool, key string, value string, err error) {
 		err = errors.New("invalid line")
 		return
 	}
-	if value = parseValue(strings.Join(items[1:], `=`)); len(value) == 0 {
+	var isEmpty bool
+	if value, isEmpty = parseValue(strings.Join(items[1:], `=`)); isEmpty {
 		return
 	}
 	key = strings.TrimSpace(items[0])
@@ -56,7 +57,7 @@ func parseLine(line string) (export bool, key string, value string, err error) {
 	}
 	return
 }
-func parseValue(value string) (result string) {
+func parseValue(value string) (result string, isEmpty bool) {
 	value = strings.TrimSpace(value)
 	var isQuotesO bool
 	var isQuotesW bool
@@ -69,13 +70,13 @@ func parseValue(value string) (result string) {
 	isReg := false
 	value = re.ReplaceAllStringFunc(value, func(s string) string {
 		isReg = true
-		if value, ok := envMap[s[2 : len(s)-1]];ok {
+		if value, ok := envMap[s[2:len(s)-1]]; ok {
 			return value
 		}
 		return s
 	})
 	if isReg {
-		return value
+		return value, false
 	}
 
 	var trimQuotes string
@@ -115,10 +116,11 @@ func parseValue(value string) (result string) {
 		result = value[:endSlice]
 
 		result = strings.Trim(result, fmt.Sprintf(" #\n\t%s", trimQuotes))
-
+	} else {
+		isEmpty = true
 	}
 
-	return result
+	return
 }
 
 func isIgnoredLine(line string) bool {

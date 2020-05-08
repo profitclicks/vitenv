@@ -30,8 +30,6 @@ func OnUpdate() (err error) {
 	return load()
 }
 
-
-
 func load() (err error) {
 	envMap = make(map[string]string)
 
@@ -40,10 +38,10 @@ func load() (err error) {
 			return errors.New(fmt.Sprintf("file %s %s", file, err.Error()))
 		}
 	}
-	if _ , ok := envMap["REMOTE_ENV"]; len(remoteFiles) == 0 && ok {
+	if _, ok := envMap["REMOTE_ENV"]; len(remoteFiles) == 0 && ok {
+		fmt.Println("Забираю", GetEnv("REMOTE_ENV", ""))
 		remoteFiles = append(remoteFiles, GetEnv("REMOTE_ENV", ""))
 	}
-
 
 	var wg sync.WaitGroup
 	var se SyncError
@@ -57,7 +55,7 @@ func load() (err error) {
 			errFormat := "file %s %s"
 
 			lines, err := loadRemoteFileAdnWriteEnvMap(file)
-			if err != nil{
+			if err != nil {
 				se.AppendError(fmt.Sprintf(errFormat, file, err.Error()))
 				return
 			}
@@ -69,7 +67,7 @@ func load() (err error) {
 		}(file)
 	}
 	wg.Wait()
-	if se.IsError(){
+	if se.IsError() {
 		return errors.New(se.GetDescription())
 	}
 	for key, value := range envMap {

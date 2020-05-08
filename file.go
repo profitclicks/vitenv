@@ -46,10 +46,8 @@ func parseLine(line string) (export bool, key string, value string, err error) {
 		err = errors.New("invalid line")
 		return
 	}
-	var isEmpty bool
-	if value, isEmpty = parseValue(strings.Join(items[1:], `=`)); isEmpty {
-		return
-	}
+
+	value = parseValue(strings.Join(items[1:], `=`))
 	key = strings.TrimSpace(items[0])
 	if strings.HasPrefix(key, "export") {
 		export = true
@@ -57,7 +55,7 @@ func parseLine(line string) (export bool, key string, value string, err error) {
 	}
 	return
 }
-func parseValue(value string) (result string, isEmpty bool) {
+func parseValue(value string) (result string) {
 	value = strings.TrimSpace(value)
 	var isQuotesO bool
 	var isQuotesW bool
@@ -76,7 +74,7 @@ func parseValue(value string) (result string, isEmpty bool) {
 		return s
 	})
 	if isReg {
-		return value, false
+		return value
 	}
 
 	var trimQuotes string
@@ -116,8 +114,6 @@ func parseValue(value string) (result string, isEmpty bool) {
 		result = value[:endSlice]
 
 		result = strings.Trim(result, fmt.Sprintf(" #\n\t%s", trimQuotes))
-	} else {
-		isEmpty = true
 	}
 
 	return

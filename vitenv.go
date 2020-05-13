@@ -39,7 +39,7 @@ func load() (err error) {
 		}
 	}
 	if _, ok := envMap["REMOTE_ENV"]; len(remoteFiles) == 0 && ok {
-		fmt.Println("Забираю", GetEnv("REMOTE_ENV", ""))
+		fmt.Println("remote env", GetEnv("REMOTE_ENV", ""))
 		remoteFiles = append(remoteFiles, GetEnv("REMOTE_ENV", ""))
 	}
 

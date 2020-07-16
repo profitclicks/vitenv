@@ -8,10 +8,10 @@ import (
 	"time"
 )
 
-var retryСount int
+var retryCount int
 
 func loadRemoteFileAdnWriteEnvMap(filename string) (lines []string, err error) {
-	retryСount = 5
+	retryCount = 5
 	lines, err = readRemoteFile(filename)
 	return
 }
@@ -24,7 +24,7 @@ func readRemoteFile(filename string) (lines []string, err error) {
 	}
 
 	if len(file) == 2 {
-		req.Header.Add("Authorization", "Basic " + file[1])
+		req.Header.Add("Authorization", "Basic "+file[1])
 	}
 
 	req.Header.Add("Accept", "application/json")
@@ -33,8 +33,8 @@ func readRemoteFile(filename string) (lines []string, err error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		if retryСount > 5 {
-			retryСount--
+		if retryCount > 5 {
+			retryCount--
 			time.Sleep(time.Second)
 			return readRemoteFile(filename)
 		}
